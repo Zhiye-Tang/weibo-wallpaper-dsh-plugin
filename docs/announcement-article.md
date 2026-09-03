@@ -22,6 +22,8 @@
 
 于是有了 [weibo-wallpaper-dsh](https://github.com/Zhiye-Tang/weibo-wallpaper-dsh-plugin):一个把微博博主相册/微博媒体变成 DSH Web 界面壁纸的宿主插件。**纯 Node 原生实现、零 npm 运行时依赖、随 DSH 进程常驻、打开即显示。**
 
+我喜欢走路摇ZLY，所以我默认的博主相册就是她的，你可以根据你的喜好将其他博主的相册作为你DSH壁纸。
+
 ### 它能做什么
 
 - **按天幂等检查**:同一天重复打开 DSH → 秒开,完全不访问微博;跨天/新内容 → 增量下载。
