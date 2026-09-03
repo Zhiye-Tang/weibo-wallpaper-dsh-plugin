@@ -15,3 +15,8 @@ ui.json
 # Node
 node_modules/
 *.log
+
+# IDE
+.idea/
+.vscode/
+*.iml
