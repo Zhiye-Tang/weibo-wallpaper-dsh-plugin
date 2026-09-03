@@ -1,0 +1,17 @@
+# 个人数据/隐私 —— 绝不入库
+# 真实运行目录(含 Cookie 的 state.json 与下载的媒体)由 config.json 的 root 指向,
+# 位于本仓库之外;若你曾把运行目录建在仓库内,请确保这些被忽略:
+config.json
+!config.example.json
+albums/
+**/albums/
+state.json
+ui.json
+*.local
+
+# 烟雾测试临时目录
+.smoke/
+
+# Node
+node_modules/
+*.log

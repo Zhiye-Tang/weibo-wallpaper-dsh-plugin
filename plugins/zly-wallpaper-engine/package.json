@@ -1,0 +1,10 @@
+{
+  "name": "zly-wallpaper-engine",
+  "version": "2.0.0",
+  "description": "微博相册壁纸引擎(DSH profile 宿主插件): 按天/月同步博主相册并作为 DSH Web 界面壁纸",
+  "license": "MIT",
+  "private": true,
+  "engines": {
+    "node": ">=18"
+  }
+}

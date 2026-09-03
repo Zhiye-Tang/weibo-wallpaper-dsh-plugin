@@ -1,0 +1,10 @@
+{
+  "name": "zly-wallpaper-boot",
+  "version": "1.0.0",
+  "description": "微博相册壁纸引擎的免刷新引导补丁(DSH profile 宿主插件)",
+  "license": "MIT",
+  "private": true,
+  "engines": {
+    "node": ">=18"
+  }
+}

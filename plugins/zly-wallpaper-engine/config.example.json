@@ -1,0 +1,7 @@
+{
+  "_comment": "复制本文件为 config.json 后按需修改(引擎只读取 config.json)。root 留空则使用默认 ~/.dsh/weibo-wallpaper。blogs 可增删以跟踪任意博主;Cookie 不在本文件里,由页面 🔑 按钮填入并保存在 <root>/<uid>/state.json。",
+  "root": "",
+  "blogs": [
+    { "uid": "1909576453", "name": "走路摇ZLY" }
+  ]
+}

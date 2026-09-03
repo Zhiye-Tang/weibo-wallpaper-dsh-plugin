@@ -1,0 +1,27 @@
+# =====================================================================
+# weibo-wallpaper-dsh —— profile 补丁示例
+# =====================================================================
+# 1) 把本仓库 plugins/ 下的两个目录(连同其 package.json / config.json)
+#    复制到你的 profile 目录,与下面这份补丁文件放同一层:
+#        Windows: %USERPROFILE%\.dsh\profiles\<你的profile>\
+#        macOS/Linux: ~/.dsh/profiles/<你的profile>/
+#    例如默认 Web GUI profile 名通常是 web。
+#    插入行的相对插件名以补丁文件所在目录解析,所以必须同目录。
+#
+# 2) 把下面整段 "- insert:" 合并进你 profile 的 cordis.patch.yml:
+#        - 仅对某个 profile 生效: <DSH_HOME>/profiles/<name>/cordis.patch.yml
+#        - 对本机所有 profile 生效: <DSH_HOME>/cordis.patch.yml
+#    注意: 不要覆盖已有文件,里面可能已经有你自己的补丁;若文件为空/仅注释,
+#    请改成包含 "- insert:" 的数组(空文件会导致启动失败)。
+#
+# 3) 重要: 两个插件目录都必须各自携带 package.json(含 name 与 version)。
+#    dsh-plugin-package-inventory 会在每次模型请求时解析每个活动本地插件行:
+#    若其最近的 package.json 有 name 而无 version,会抛错并导致所有请求失败
+#    (REQUEST_EXTENSION)。示例仓库已配好,勿删。
+#
+# 4) 保存后完整重启 DSH profile(不是只关标签页),壁纸即随进程常驻。
+- insert:
+    - id: zly-wallpaper-boot
+      name: ./zly-wallpaper-boot/index.cjs
+    - id: zly-wallpaper-engine
+      name: ./zly-wallpaper-engine/index.cjs

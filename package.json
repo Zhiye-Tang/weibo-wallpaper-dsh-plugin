@@ -1,0 +1,14 @@
+{
+  "name": "weibo-wallpaper-dsh",
+  "version": "2.0.0",
+  "description": "把微博博主的相册内容变成 DSH(DeepSeek Harness)Web 界面壁纸的宿主插件(含多博主、按月归档、历史回填、三种显示模式)",
+  "private": true,
+  "license": "MIT",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "check": "node scripts/check.cjs",
+    "test": "node test/smoke.cjs"
+  }
+}
