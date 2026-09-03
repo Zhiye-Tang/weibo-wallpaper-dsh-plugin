@@ -9,6 +9,10 @@
 
 > English: A DSH (DeepSeek Harness) host plugin that syncs a Weibo blogger's album/media by month into local `YYYY-MM` folders and shows them as the wallpaper behind the DSH web UI. Cookie is required and stays local. Still under active development — feedback welcome.
 
+> **Language**: [中文](#目录) · [English](#english-documentation)
+>
+> ⭐ **如果这个项目对你有帮助,欢迎点个 Star** —— 它是作者持续开发的动力。(完整英文版见文末 `#english-documentation`。)
+
 ---
 
 ## 效果预览
@@ -26,6 +30,8 @@
 | 全遮挡 solid | ● | 界面保持默认不透明,壁纸被完全遮挡(相当于关闭壁纸) |
 | 半透明毛玻璃 glass | ◐ | 默认模式:界面变半透明 + 毛玻璃模糊,壁纸透出 |
 | 全透明 clear | ◯ | 界面完全透明,壁纸直接铺满背景 |
+
+> 📸 **真实运行截图(TODO)**:上方为离线界面示意。壁纸在你的 DSH 上跑起来后,用系统截图工具(Snipping Tool / Win+Shift+S)截取真实页面,保存为 `docs/screenshots/live-dark.png`、`live-light.png`,并把上表换成真实截图(欢迎提交 PR)。`docs/social-preview.png` 为 1280×640 社交预览图,可上传到 GitHub 仓库设置 → Social preview。
 
 ---
 
@@ -213,7 +219,7 @@ weibo-wallpaper-dsh/
 ├─ install/cordis.patch.snippet.yml# 安装补丁示例(合并进 profile 的 cordis.patch.yml)
 ├─ scripts/check.cjs               # 发布质量检查:语法/清单/敏感信息/个人数据
 ├─ test/smoke.cjs                  # 离线烟雾测试(假网络/假 ctx,28 项断言)
-├─ docs/screenshots/               # 效果示意图
+├─ docs/                           # 效果截图 / 社交预览图 / 发布文案草稿
 └─ .github/                        # Issue(🐛/💡)与 PR 模板
 ```
 
@@ -235,6 +241,107 @@ node test/smoke.cjs      # 离线烟雾测试:旧数据迁移、多博主抓取�
 - 📦 想贡献代码?→ 先跑 `node scripts/check.cjs` 与 `npm test`,再提 PR(见 [PR 模板](.github/PULL_REQUEST_TEMPLATE.md))
 
 已知候选方向(欢迎投票/补充):Cookie 到期自动提醒;按需只存图片或只存视频;单视频循环时长与清晰度选项;把同步结果推送到页面角标;打包为可 `dsh plugin add` 的 bundle 便于一键安装;多语言 README。
+
+---
+
+# English Documentation
+
+## What is it
+
+**weibo-wallpaper-dsh** turns a Weibo blogger's album/media into the **wallpaper of the DSH (DeepSeek Harness) Web UI**. It is a host-level Cordis plugin composed into your DSH profile:
+
+- On every DSH start it checks Weibo: **same day → skipped**, new day / new month → incremental download into local `YYYY-MM` folders.
+- On first run it **auto-backfills this year's Jan → last month** albums (resumable pagination, existing files are skipped, so re-runs are cheap).
+- **Multiple bloggers**: one plugin + one of *your own* Weibo cookies can track several bloggers at once (each has its own folder and state).
+- Three display modes, month switching, and a self-healing loader — the wallpaper shows **without a manual refresh**, whether or not an agent session is open.
+
+> ⭐ **If you find this useful, please star the repo** — it is the main fuel for continued development.
+
+## Install (for other users)
+
+Prerequisites: a DSH installation with a Web GUI profile (commonly named `web`) that supports the user patch layer `cordis.patch.yml`; Node ≥ 18 (the DSH bundled runtime already satisfies this); a Weibo account for the cookie.
+
+1. Locate your profile directory — usually `%USERPROFILE%\.dsh\profiles\<profile>\` on Windows or `~/.dsh/profiles/<profile>/` on macOS/Linux. It is the folder that holds (or will hold) the profile's `cordis.patch.yml`.
+2. Copy both `plugins/` folders (`zly-wallpaper-engine/`, `zly-wallpaper-boot/`, each with its `package.json`) into that profile directory, next to the patch file.
+3. Merge the `- insert:` entries from `install/cordis.patch.snippet.yml` into the profile's `cordis.patch.yml` (or into `$DSH_HOME/cordis.patch.yml` to apply to every profile). Never overwrite an existing file wholesale — it may already contain your own patches.
+4. Inside `zly-wallpaper-engine/`, copy `config.example.json` → `config.json` and edit it (see below).
+5. **Restart the DSH profile** (process-level restart, not just closing tabs), then open the DSH page. Tabs opened before the restart need one F5 to pick up the boot script; afterwards no refresh is ever needed.
+
+> ⚠️ **Why must each plugin folder ship its own `package.json` with both `name` and `version`?** DSH's plugin inventory resolves every active local plugin row against its nearest manifest on every model request; a manifest with a `name` but no `version` makes every request fail with `REQUEST_EXTENSION` (“DeepSeek request extension preparation failed”). Keep the provided manifests intact.
+
+## Configuration (config.json)
+
+File: `<profile>/zly-wallpaper-engine/config.json`. If absent, defaults apply: root → `~/.dsh/weibo-wallpaper`, bloggers → 走路摇ZLY.
+
+```json
+{
+  "root": "D:/your/path/weibo-wallpaper-data",
+  "blogs": [
+    { "uid": "1909576453", "name": "走路摇ZLY" }
+  ]
+}
+```
+
+- `root`: local data root (keep it outside the repository!). Empty string uses the default.
+- `blogs`: list of `uid` + `name`. **Add another entry to track another blogger** — each uid gets its own state and `albums/` subfolder. `uid` is the numeric Weibo user id (from `weibo.com/u/<number>` on the profile page). Cookies are *not* stored here; they are set from the UI and stored in `<root>/<uid>/state.json`.
+
+## Getting the Weibo Cookie
+
+The plugin talks to the **m.weibo.cn** mobile JSON API, which needs a cookie from *your own logged-in* account (content reach = whatever your account can see).
+
+1. Open and sign in at `https://m.weibo.cn` (must be m.weibo.cn, not www.weibo.com).
+2. Press F12 → Network → reload → pick any `api/container` or `statuses` request → copy the full `Cookie:` request header (usually starts with `SUB=`).
+3. In the DSH page, click the **🔑** button in the control bar, paste the cookie, press Enter, then click **⟳** to verify.
+
+- The cookie stays **on your machine** in `<root>/<uid>/state.json`. Never paste it into issues, screenshots, or chats.
+- Cookies expire (typically days to weeks). When the label says "需登录" or shows `432`/login-gate, repeat the steps. Submitting an empty value clears the cookie.
+
+## Usage
+
+1. After install + restart, the wallpaper shows the latest month with content; the control bar sits at the bottom of the page.
+2. First use: 🔑 paste cookie → ⟳. The current month syncs first, then the **historical backfill** (Jan → last month of this year) runs in the background page by page; closing DSH mid-way is fine (it resumes next start).
+3. Daily use: re-opening DSH the same day skips Weibo entirely; new content downloads on a later day or when you press ⟳; a new calendar month automatically creates a fresh `YYYY-MM` folder.
+4. Control bar: ⏮/⏯/⏭ media controls · blogger dropdown (multi-blogger only) · month dropdown · ⟳ force check · 🔑 cookie · mode button cycling ● solid / ◐ glass / ◯ clear.
+
+## Notes & Caveats
+
+- **Restart required after install**: new plugin rows/files need a process-level restart of the profile.
+- **Once per day**: repeated opens on the same date skip Weibo (by design) unless you press ⟳.
+- **Per-blogger state**: 🔑/⟳ apply to the currently selected blogger; set each blogger's cookie once (usually the same cookie).
+- **Weibo API may change**: this relies on current mobile-web JSON behaviors; breaking changes by Weibo may require an update — exactly what the issue tracker is for.
+- **Never commit personal data**: `state.json`, `ui.json`, `albums/` and real `config.json` are git-ignored; keep the runtime root outside the repository.
+
+## Risks & Disclaimer
+
+1. **Unofficial API**: no SLA; Weibo may rate-limit (`432`), change, or block endpoints. The plugin throttles requests (250–900 ms between pages/files), skips failures and resumes from checkpoints, but cannot guarantee immunity.
+2. **Cookie credential**: the cookie is a slice of your login state. It is stored locally and never sent anywhere by this code, but any on-disk credential has an attack surface — use it only on your own machine and log out / rotate it periodically. The author is not responsible for account issues caused by cookie leaks.
+3. **Traffic & storage**: the first historical backfill downloads a lot of media (several months × dozens of items per month, original size). Downloads are incremental and deduplicated; re-runs do not re-download.
+4. **Copyright**: downloaded content belongs to its original authors. This project is for **personal, local use only**; do not re-distribute or publish the downloaded media. The default blogger entry is just a config default — use bloggers you actually want to follow.
+5. **As-is**: MIT licensed, no warranty of any kind.
+
+## Advantages
+
+- Zero runtime npm dependencies; pure Node `fs`/`fetch`.
+- Runs at the profile/process layer — wallpaper never depends on an open agent session.
+- Day-idempotent checks + filename dedup → no redundant requests or files.
+- Resumable historical backfill → close DSH any time.
+- Multi-blogger in one plugin; UI-only switches for mode / month / blogger.
+- No telemetry; network traffic goes only to Weibo, data stays on your machine.
+
+## Development
+
+- Repo layout: see the Chinese section [项目结构与开发](#项目结构与开发).
+- Self-checks: `node scripts/check.cjs` (static: syntax, manifests, no author paths / cookies / personal data) and `node test/smoke.cjs` (offline 28-assertion smoke test with a stubbed network — safe to run).
+
+## Contributing
+
+**Under active development — all feedback is welcome.** Bug reports and feature ideas via Issues (templates provided), code via PRs (run the checks above first). See the Chinese sections above for the known roadmap candidates.
+
+## License
+
+[MIT](LICENSE) © 汤志烨. Downloaded media remains the property of its original authors; use it for personal, local purposes only.
+
+---
 
 ## 开源协议
 
